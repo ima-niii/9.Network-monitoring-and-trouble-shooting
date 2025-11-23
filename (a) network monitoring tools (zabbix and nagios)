@@ -1,0 +1,86 @@
+This chapter covers the installation and configuration of Nagios and Zabbix on a Fedora Server for monitoring network health, server performance, and device availability.
+Nagios: A powerful, extensible monitoring tool widely used for servers, network devices, and services.
+Zabbix: A modern monitoring solution with a web-based frontend, offering templates, alerting, and performance graphs.
+Using these tools allows administrators to detect, alert, and resolve issues proactively.
+
+Installing and Configuring Nagios
+................................
+Step 1: Install Nagios
+sudo dnf install nagios
+
+Step 2: Install Additional Plugins
+Nagios uses plugins to monitor different services:
+sudo dnf install nagios-plugins-all
+
+Step 3: Start Nagios Service
+sudo systemctl start nagios
+
+Step 4: Enable Nagios at Boot
+sudo systemctl enable nagios
+
+Step 5: Access Nagios Web Interface
+Open a browser and go to:
+http://<server-ip-or-domain>/nagios/
+Default login credentials:
+Username: nagiosadmin
+Password: set during installation
+
+Step 6: Configure Nagios
+Configuration files are in:
+sudo nano /etc/nagios/<config-file>.cfg
+Define hosts, services, and notifications by editing the .cfg files.
+
+ Installing and Configuring Zabbix
+ ..................................
+Step 1: Add Zabbix Repository
+sudo dnf install https://repo.zabbix.com/zabbix/5.4/rhel/8/x86_64/zabbix-release-5.4-1.el8.noarch.rpm
+
+Step 2: Install Zabbix Server, Web Frontend, and Agent
+sudo dnf install zabbix-server-mysql zabbix-web-mysql zabbix-appliance
+
+Step 3: Create Zabbix Database
+Log in to MySQL/MariaDB:
+mysql -u root -p
+
+Run the following commands inside MySQL:
+CREATE DATABASE zabbix CHARACTER SET utf8 COLLATE utf8_bin;
+CREATE USER 'zabbix'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+Step 4: Import Zabbix Database Schema
+zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -p zabbix
+
+Step 5: Configure Zabbix Server
+Edit the server configuration:
+sudo nano /etc/zabbix/zabbix_server.conf
+
+
+Set the database password:
+DBPassword=your_password
+
+Step 6: Start and Enable Zabbix Services
+sudo systemctl start zabbix-server zabbix-agent httpd
+sudo systemctl enable zabbix-server zabbix-agent httpd
+
+Step 7: Access Zabbix Web Interface
+Open a browser:
+http://<server-ip-or-domain>/zabbix
+
+
+Default login:
+Username: Admin
+Password: zabbix
+
+From the web interface, you can:
+Add hosts
+Create templates
+Set up alerting and notifications
+
+ NOTE:
+Always secure your web interfaces with strong passwords.
+Regularly update Nagios and Zabbix packages.
+Tailor monitoring templates to your network and server environment.
+
+Test alerts to ensure notifications are received promptly.
