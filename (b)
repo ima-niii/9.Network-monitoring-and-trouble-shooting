@@ -1,0 +1,98 @@
+System and Network Performance Tuning on Fedora
+This chapter covers optimizing the system and network performance on a Fedora Server, including memory management, file system tuning, kernel parameters, and network responsiveness.
+
+1. Upgrade and Update Fedora
+............................
+Ensure your server has the latest updates and security patches:
+sudo dnf update -y
+
+ Always update before tuning your system to avoid compatibility issues.
+
+2.Use Performance Monitoring Tools
+....................................
+Monitor your system to identify resource bottlenecks:
+top – Basic, real-time process monitor:
+top
+
+htop – Advanced interactive process monitor (install if missing):
+sudo dnf install htop -y
+htop
+
+glances – Comprehensive system monitoring:
+sudo dnf install glances -y
+glances
+
+*Use these tools to check CPU, memory, disk I/O, and network usage.
+
+3. Adjust Swappiness
+.......................
+Swappiness controls how aggressively Linux uses swap space. Recommended value for servers: 10–20.
+Edit sysctl.conf
+sudo nano /etc/sysctl.conf
+
+To add or modify:
+vm.swappiness = 10
+
+To apply changes:
+sudo sysctl -p
+
+4. Optimize File System Mount Options
+.....................................
+For SSDs and modern storage:
+Open /etc/fstab:
+sudo nano /etc/fstab
+
+*Add noatime and nodiratime to reduce disk writes. Example:
+
+UUID=<your-uuid> / ext4 defaults,noatime,nodiratime 0 1
+Replace <your-uuid> with the actual UUID of your partition (sudo blkid to find it).
+
+5.Enable TRIM for SSDs
+.......................
+TRIM helps maintain SSD performance over time.
+sudo systemctl enable fstrim.timer
+sudo systemctl start fstrim.timer
+
+
+Check status with:
+systemctl status fstrim.timer
+
+ 6.Optimize Kernel Parameters
+..............................
+Edit /etc/sysctl.conf to improve network performance:
+sudo nano /etc/sysctl.conf
+
+Recommended settings for network tuning
+ Increase maximum number of connections
+net.core.somaxconn = 1024
+net.core.netdev_max_backlog = 5000
+
+Improve TCP connection handling
+net.ipv4.tcp_max_syn_backlog = 2048
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_tw_reuse = 1
+
+To apply changes
+sudo sysctl -p
+Be sure to adjust values according to your server workload.
+
+7.Configure Firewall and Network Settings
+.........................................
+Use firewalld for optimal firewall rules:
+sudo firewall-cmd --list-all
+sudo firewall-cmd --zone=public --add-service=http --permanent
+sudo firewall-cmd --reload
+
+To review network scripts:
+sudo nano /etc/sysconfig/network-scripts/ifcfg-<interface>
+
+To fine-tune network performance:
+sudo ethtool -G <interface> rx 4096 tx 4096
+Replace <interface> with your network interface, e.g., ens160.
+
+ Note:
+Always backup configuration files before making changes.
+Test any tuning changes in a staging environment if possible.
+Monitor system performance continuously using top, htop, or glances.
+
+Combine kernel, network, and storage tuning for optimal overall performance.
