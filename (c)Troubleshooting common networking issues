@@ -1,0 +1,68 @@
+
+2.Troubleshooting Common Networking Issues
+Step 1: Check Network Status
+nmcli
+# or
+ip a
+
+Step 2: Test Network Connectivity
+ping -c 4 8.8.8.8
+
+Step 3: Check DNS Configuration
+Verify /etc/resolv.conf points to a working DNS server.
+Check /etc/nsswitch.conf for correct DNS resolution.
+
+Step 4: Check Firewall Rules
+sudo firewall-cmd --list-all
+sudo firewall-cmd --add-service=http --permanent
+sudo firewall-cmd --reload
+
+Step 5: Check for IP Conflicts
+Ensure every device has a unique IP.
+
+Step 6: Check Physical/Virtual Connections
+Physical server: verify cables, switch ports, NIC status.
+
+Virtual server: verify VM host networking.
+
+Step 7: Restart Network Services
+sudo systemctl restart NetworkManager
+ Or, if NetworkManager is not used:
+sudo systemctl restart network
+
+Step 8: Troubleshoot Network Hardware
+Check NICs, switches, or routers.
+
+*Test on a different network connection if needed.
+
+Step 9: Check SELinux and Host Firewalls
+Temporarily disable SELinux for testing:
+sudo setenforce 0
+
+Step 10: Check Log Files
+Important logs:
+/var/log/messages
+/var/log/syslog
+/var/log/dmesg
+
+Step 11: Review Network Configuration Files
+sudo nano /etc/sysconfig/network-scripts/ifcfg-<interface>
+sudo nano /etc/sysconfig/network
+sudo nano /etc/resolv.conf
+
+Step 12: DHCP and Routing Issues
+Check DHCP server, lease pool, and lease time.
+
+Review routing table:
+ip route
+
+Ensure interfaces are not administratively disabled:
+ip link
+ifconfig
+
+Step 13: Reboot the Server (if needed)
+sudo reboot
+
+A simple reboot can sometimes resolve persistent networking issues.
+
+
